@@ -50,5 +50,6 @@ def login(update: Update, context: CallbackContext):
     opt = randint(100000, 999999)
 
     cache.set(f"otp_{user_id}", opt, timeout=60)  # OTP valid for 1 minutes
+    cache.set(f"user_{opt}", user_id, timeout=60)  # Map OTP to user ID for later retrieval
 
     update.message.reply_text(f"Your OTP is: {opt}")
