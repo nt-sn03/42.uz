@@ -1,5 +1,6 @@
 from random import randint
 
+from django.core.cache import cache
 from telegram import Update
 from telegram.ext import CallbackContext
 
@@ -40,6 +41,14 @@ def login(update: Update, context: CallbackContext):
         context.bot.send_message(chat_id=chat_id, text=welcome_message)
         return
     
+    existing_opt = cache.get(f"otp_{user_id}")
+    if existing_opt:
+        welcome_message = f"Your OTP is still valid: {existing_opt}"
+        context.bot.send_message(chat_id=chat_id, text=welcome_message)
+        return
+    
     opt = randint(100000, 999999)
+
+    cache.set(f"otp_{user_id}", opt, timeout=60)  # OTP valid for 1 minutes
 
     update.message.reply_text(f"Your OTP is: {opt}")
